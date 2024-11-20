@@ -1,0 +1,29 @@
+version: '3.4'
+
+networks:
+  appnetwork:
+    driver: bridge
+
+services:
+  demoappdb:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      SA_PASSWORD: "password@1234#"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "8002:1433"
+    networks:
+      - appnetwork
+
+  api_creation_learningmigration:
+    image: ${DOCKER_REGISTRY-}apicreationlearningmigration
+    build:
+      context: .
+      dockerfile: Api_Creation_LearningMigration/Dockerfile
+    environment:
+      - DB_HOST=demoappdb
+      - DB_NAME=Docker_api_creation
+      - DB_SA_PASSWORD=password@1234#
+    networks:
+      - appnetwork

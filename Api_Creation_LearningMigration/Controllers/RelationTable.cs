@@ -2,6 +2,8 @@
 using Api_Creation_LearningMigration.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Api_Creation_LearningMigration.Controllers
 {
@@ -9,30 +11,12 @@ namespace Api_Creation_LearningMigration.Controllers
     [Route("[controller]")]
     public class RelationTable : ControllerBase
     {
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
         private readonly ApplicationDbContext _context;
+
         public RelationTable(ApplicationDbContext applicationDbContext)
         {
             _context = applicationDbContext;
         }
-
-        //public ActionResult AddEmployee(Employee employee)
-        //{
-        //    if(employee == null)
-        //    {
-        //        return BadRequest("Required Fields");
-        //    }
-        //    var result = _context.AddAsync(employee.Department);
-        //    _context.SaveChanges();
-        //    employee.DeptID = result.ID;
-        //    _context.AddAsync(employee);
-        //    _context.SaveChanges();
-
-        //    return Ok(employee);
-        //}
 
         [HttpPost]
         public async Task<IActionResult> PostEmployeeWithDepartment([FromBody] Employee employeeWithDepartmentDto)
@@ -44,7 +28,7 @@ namespace Api_Creation_LearningMigration.Controllers
 
             // Check if the department already exists
             var existingDepartment = await _context.DepartmentsTbl
-                .FirstOrDefaultAsync(d => d.Id == employeeWithDepartmentDto.DeptID);
+                .FirstOrDefaultAsync(d => d.DeptName == employeeWithDepartmentDto.Department.DeptName);
 
             if (existingDepartment == null)
             {
@@ -71,13 +55,14 @@ namespace Api_Creation_LearningMigration.Controllers
                 employeeWithDepartmentDto.DeptID = existingDepartment.Id;
             }
 
-            // Map DTO to entity
+            // Create a new Employee entity
             var employee = new Employee
             {
                 EmpName = employeeWithDepartmentDto.EmpName,
                 Salary = employeeWithDepartmentDto.Salary,
                 City = employeeWithDepartmentDto.City,
-                DeptID = employeeWithDepartmentDto.DeptID
+                DeptID = employeeWithDepartmentDto.DeptID,
+                Department = existingDepartment ?? new Department { DeptName = employeeWithDepartmentDto.Department.DeptName }
             };
 
             _context.EmployeeTbl.Add(employee);
@@ -99,5 +84,7 @@ namespace Api_Creation_LearningMigration.Controllers
 
             return employee;
         }
+
+        // Additional CRUD methods can be added here as needed
     }
 }

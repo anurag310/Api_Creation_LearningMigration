@@ -16,8 +16,9 @@ namespace Api_Creation_LearningMigration.Model
         public int Salary { get; set; }
         [Required]
         public string City { get; set; }
+        [JsonIgnore]
         public int DeptID { get; set; }
-
+        [ForeignKey("DeptID")]
         public Department Department { get; set; }
     }
 }
