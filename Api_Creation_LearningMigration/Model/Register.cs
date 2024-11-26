@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace Api_Creation_LearningMigration.Model
 {
+    // register model
     public class Register
     {
         [Key]
